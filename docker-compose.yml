@@ -1,0 +1,43 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: dig_server
+    environment:
+      - PORT=4000
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@diginvictus.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production}
+      - DATA_DIR=/data
+      - UPLOAD_DIR=/data/uploads
+    volumes:
+      - dig_data:/data
+    ports:
+      - "${SERVER_PORT:-4000}:4000"
+    restart: unless-stopped
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: dig_client
+    depends_on:
+      - server
+    ports:
+      - "${CLIENT_PORT:-8080}:80"
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: .
+      dockerfile: admin/Dockerfile
+    container_name: dig_admin
+    depends_on:
+      - server
+    ports:
+      - "${ADMIN_PORT:-8081}:80"
+    restart: unless-stopped
+
+volumes:
+  dig_data:
