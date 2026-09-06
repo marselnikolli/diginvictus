@@ -10,6 +10,7 @@ function rowToClient(row) {
     name: row.name,
     websiteUrl: row.website_url,
     logo: row.logo,
+    description: row.description,
     active: row.active,
     order: row.position,
   };
@@ -23,29 +24,30 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", requireAuth, (req, res) => {
-  const { name, websiteUrl, logo, active, order } = req.body || {};
+  const { name, websiteUrl, logo, description, active, order } = req.body || {};
   if (!name) return res.status(400).json({ error: "Name is required" });
   const max = db.prepare("SELECT COALESCE(MAX(position), 0) AS m FROM clients").get().m;
   const result = db
     .prepare(
-      "INSERT INTO clients (name, website_url, logo, active, position) VALUES (?, ?, ?, ?, ?)"
+      "INSERT INTO clients (name, website_url, logo, description, active, position) VALUES (?, ?, ?, ?, ?, ?)"
     )
-    .run(name, websiteUrl || "", logo || "", active === false ? 0 : 1, order ?? max + 1);
+    .run(name, websiteUrl || "", logo || "", description || "", active === false ? 0 : 1, order ?? max + 1);
   const row = db.prepare("SELECT * FROM clients WHERE id = ?").get(result.lastInsertRowid);
   res.status(201).json(rowToClient(row));
 });
 
 router.put("/:id", requireAuth, (req, res) => {
   const { id } = req.params;
-  const { name, websiteUrl, logo, active, order } = req.body || {};
+  const { name, websiteUrl, logo, description, active, order } = req.body || {};
   const existing = db.prepare("SELECT * FROM clients WHERE id = ?").get(id);
   if (!existing) return res.status(404).json({ error: "Client not found" });
   db.prepare(
-    "UPDATE clients SET name = ?, website_url = ?, logo = ?, active = ?, position = ? WHERE id = ?"
+    "UPDATE clients SET name = ?, website_url = ?, logo = ?, description = ?, active = ?, position = ? WHERE id = ?"
   ).run(
     name ?? existing.name,
     websiteUrl ?? existing.website_url,
     logo ?? existing.logo,
+    description ?? existing.description,
     active === undefined ? existing.active : active ? 1 : 0,
     order ?? existing.position,
     id

@@ -19,7 +19,7 @@ export default function ClientsManager() {
 
   useEffect(load, []);
 
-  const form = editing || { name: "", websiteUrl: "", logo: "", active: true };
+  const form = editing || { name: "", websiteUrl: "", logo: "", description: "", active: true };
 
   function updateForm(field, v) {
     setEditing({ ...form, [field]: v });
@@ -69,7 +69,7 @@ export default function ClientsManager() {
     <div>
       <header className="page-header">
         <h1>Clients</h1>
-        <button type="button" className="btn btn--primary" onClick={() => setEditing({ name: "", websiteUrl: "", logo: "", active: true })}>
+        <button type="button" className="btn btn--primary" onClick={() => setEditing({ name: "", websiteUrl: "", logo: "", description: "", active: true })}>
           + Add client
         </button>
       </header>
@@ -82,6 +82,7 @@ export default function ClientsManager() {
           <div className="form-grid">
             <TextInput label="Name" value={form.name} onChange={(v) => updateForm("name", v)} />
             <TextInput label="Website URL" value={form.websiteUrl} onChange={(v) => updateForm("websiteUrl", v)} />
+            <TextInput label="Project description" value={form.description || ""} onChange={(v) => updateForm("description", v)} />
             <ImageInput label="Logo" value={form.logo} onChange={(v) => updateForm("logo", v)} />
             <Toggle label="Visible on site" value={form.active} onChange={(v) => updateForm("active", v)} />
           </div>

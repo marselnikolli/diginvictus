@@ -39,6 +39,7 @@ db.exec(`
     name TEXT NOT NULL,
     website_url TEXT,
     logo TEXT,
+    description TEXT,
     active INTEGER NOT NULL DEFAULT 1,
     position INTEGER NOT NULL DEFAULT 0
   );
@@ -60,6 +61,19 @@ db.exec(`
   );
 `);
 
+function migrateClientsDescription() {
+  const columns = db.prepare("PRAGMA table_info(clients)").all();
+  if (!columns.some((c) => c.name === "description")) {
+    db.exec("ALTER TABLE clients ADD COLUMN description TEXT");
+  }
+  const byName = new Map(DEFAULT_CLIENTS.map((c) => [c.name, c.description]));
+  const stmt = db.prepare("UPDATE clients SET description = ? WHERE name = ? AND (description IS NULL OR description = '')");
+  for (const [name, description] of byName) {
+    if (description) stmt.run(description, name);
+  }
+}
+migrateClientsDescription();
+
 function seedSettings() {
   const sections = {
     site: DEFAULT_SITE,
@@ -77,10 +91,10 @@ function seedClients() {
   const count = db.prepare("SELECT COUNT(*) AS c FROM clients").get().c;
   if (count > 0) return;
   const stmt = db.prepare(
-    "INSERT INTO clients (name, website_url, logo, active, position) VALUES (?, ?, ?, ?, ?)"
+    "INSERT INTO clients (name, website_url, logo, description, active, position) VALUES (?, ?, ?, ?, ?, ?)"
   );
   for (const c of DEFAULT_CLIENTS) {
-    stmt.run(c.name, c.websiteUrl, c.logo, c.active, c.order);
+    stmt.run(c.name, c.websiteUrl, c.logo, c.description || "", c.active, c.order);
   }
 }
 

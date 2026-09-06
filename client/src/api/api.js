@@ -16,7 +16,3 @@ export function getContent() {
 export function getClients() {
   return fetchJson("/api/clients");
 }
-
-export function getTestimonials() {
-  return fetchJson("/api/testimonials");
-}
