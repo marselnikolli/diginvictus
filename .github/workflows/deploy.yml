@@ -33,6 +33,8 @@ jobs:
             git checkout main
             echo "==> Pulling changes (ff-only)"
             git pull --ff-only origin main
+            echo "==> Ensuring .env is readable by the deploy user"
+            sudo chmod 644 .env 2>/dev/null || chmod 644 .env 2>/dev/null || true
             echo "==> Building and restarting containers"
             docker compose up -d --build
             echo "==> Deploy complete: $(git rev-parse --short HEAD)"
