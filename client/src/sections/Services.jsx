@@ -123,9 +123,6 @@ export default function Services() {
               </div>
             </div>
             <div className="services-card-delivery">Delivery: {s.delivery}</div>
-            <a className="services-card-cta" href="#contact">
-              Inquire
-            </a>
           </div>
         ))}
       </div>
