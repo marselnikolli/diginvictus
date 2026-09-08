@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const DOT_COLOR = "217, 225, 233"; // 0xD9E1E9 — original particle color
+const DOT_COLOR = "150, 225, 240"; // soft ice-blue particles
 const DOT_COUNT = 1000;
 const SPHERE_MIN = 450;
 const SPHERE_SPREAD = 10; // radius = 450 + random*10 → thin shell

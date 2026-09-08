@@ -116,13 +116,18 @@ export default function Services() {
               </ul>
             )}
             <div className="services-card-footer">
-              <span className="services-card-from">starting from</span>
+              <span className="services-card-from">Fixed from</span>
               <div className="services-card-rate">
                 <span className="services-card-price">{s.price}</span>
-                <span className="services-card-duration">/ {s.delivery}</span>
+                <span className="services-card-duration">· {s.delivery}</span>
               </div>
+              <a
+                href={`mailto:hello@diginvictus.com?subject=Engagement%20request%3A%20${encodeURIComponent(s.title)}`}
+                className="text-link services-card-cta"
+              >
+                Request engagement
+              </a>
             </div>
-            <div className="services-card-delivery">Delivery: {s.delivery}</div>
           </div>
         ))}
       </div>
