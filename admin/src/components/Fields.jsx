@@ -24,6 +24,27 @@ export function Textarea({ label, value, onChange, rows = 3 }) {
   );
 }
 
+export function ListInput({ label, value, onChange, rows = 4 }) {
+  const text = Array.isArray(value) ? value.join("\n") : value || "";
+  return (
+    <label className="field">
+      <span className="field-label">{label}</span>
+      <textarea
+        rows={rows}
+        value={text}
+        onChange={(e) =>
+          onChange(
+            e.target.value
+              .split("\n")
+              .map((line) => line.trim())
+              .filter((line) => line.length > 0)
+          )
+        }
+      />
+    </label>
+  );
+}
+
 export function Toggle({ label, value, onChange }) {
   return (
     <label className="field field--toggle">
