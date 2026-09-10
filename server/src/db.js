@@ -7,7 +7,11 @@ import {
   DEFAULT_SITE,
   DEFAULT_HERO,
   DEFAULT_HIGHLIGHTS,
+  DEFAULT_SERVICES,
+  DEFAULT_PROCESS,
+  DEFAULT_CTA,
   DEFAULT_FOOTER,
+  DEFAULT_UI,
   DEFAULT_CLIENTS,
   DEFAULT_TESTIMONIALS,
   DEFAULT_ADMIN,
@@ -40,6 +44,7 @@ db.exec(`
     website_url TEXT,
     logo TEXT,
     description TEXT,
+    translations TEXT,
     active INTEGER NOT NULL DEFAULT 1,
     position INTEGER NOT NULL DEFAULT 0
   );
@@ -50,6 +55,7 @@ db.exec(`
     author TEXT,
     role TEXT,
     company TEXT,
+    translations TEXT,
     active INTEGER NOT NULL DEFAULT 1,
     position INTEGER NOT NULL DEFAULT 0
   );
@@ -61,13 +67,33 @@ db.exec(`
   );
 `);
 
-function migrateClientsDescription() {
-  const columns = db.prepare("PRAGMA table_info(clients)").all();
-  if (!columns.some((c) => c.name === "description")) {
-    db.exec("ALTER TABLE clients ADD COLUMN description TEXT");
+const DEFAULT_SECTIONS = {
+  site: DEFAULT_SITE,
+  hero: DEFAULT_HERO,
+  highlights: DEFAULT_HIGHLIGHTS,
+  services: DEFAULT_SERVICES,
+  process: DEFAULT_PROCESS,
+  cta: DEFAULT_CTA,
+  footer: DEFAULT_FOOTER,
+  ui: DEFAULT_UI,
+};
+
+function ensureColumn(table, column, type) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!columns.some((c) => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
   }
+}
+
+ensureColumn("clients", "description", "TEXT");
+ensureColumn("clients", "translations", "TEXT");
+ensureColumn("testimonials", "translations", "TEXT");
+
+function migrateClientsDescription() {
   const byName = new Map(DEFAULT_CLIENTS.map((c) => [c.name, c.description]));
-  const stmt = db.prepare("UPDATE clients SET description = ? WHERE name = ? AND (description IS NULL OR description = '')");
+  const stmt = db.prepare(
+    "UPDATE clients SET description = ? WHERE name = ? AND (description IS NULL OR description = '')"
+  );
   for (const [name, description] of byName) {
     if (description) stmt.run(description, name);
   }
@@ -75,15 +101,38 @@ function migrateClientsDescription() {
 migrateClientsDescription();
 
 function seedSettings() {
-  const sections = {
-    site: DEFAULT_SITE,
-    hero: DEFAULT_HERO,
-    highlights: DEFAULT_HIGHLIGHTS,
-    footer: DEFAULT_FOOTER,
-  };
   const stmt = db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)");
-  for (const [key, value] of Object.entries(sections)) {
+  for (const [key, value] of Object.entries(DEFAULT_SECTIONS)) {
     stmt.run(key, JSON.stringify(value));
+  }
+}
+seedSettings();
+
+function migrateSettingsLocales() {
+  const rows = db.prepare("SELECT key, value FROM settings").all();
+  const update = db.prepare("UPDATE settings SET value = ? WHERE key = ?");
+  for (const row of rows) {
+    let parsed;
+    try {
+      parsed = JSON.parse(row.value);
+    } catch {
+      continue;
+    }
+    if (parsed && typeof parsed === "object" && "en" in parsed) continue;
+    const defaults = DEFAULT_SECTIONS[row.key] || { it: {}, sq: {} };
+    update.run(JSON.stringify({ en: parsed, it: defaults.it || {}, sq: defaults.sq || {} }), row.key);
+  }
+}
+migrateSettingsLocales();
+
+function seedCollectionTranslations(table, defaults, matchKey) {
+  const rows = db.prepare(`SELECT * FROM ${table}`).all();
+  const update = db.prepare(`UPDATE ${table} SET translations = ? WHERE id = ?`);
+  for (const row of rows) {
+    const has = row.translations && row.translations !== "" && row.translations !== "{}";
+    if (has) continue;
+    const def = defaults.find((d) => d[matchKey] === row[matchKey]);
+    if (def?.translations) update.run(JSON.stringify(def.translations), row.id);
   }
 }
 
@@ -91,10 +140,18 @@ function seedClients() {
   const count = db.prepare("SELECT COUNT(*) AS c FROM clients").get().c;
   if (count > 0) return;
   const stmt = db.prepare(
-    "INSERT INTO clients (name, website_url, logo, description, active, position) VALUES (?, ?, ?, ?, ?, ?)"
+    "INSERT INTO clients (name, website_url, logo, description, translations, active, position) VALUES (?, ?, ?, ?, ?, ?, ?)"
   );
   for (const c of DEFAULT_CLIENTS) {
-    stmt.run(c.name, c.websiteUrl, c.logo, c.description || "", c.active, c.order);
+    stmt.run(
+      c.name,
+      c.websiteUrl,
+      c.logo,
+      c.description || "",
+      JSON.stringify(c.translations || {}),
+      c.active,
+      c.order
+    );
   }
 }
 
@@ -102,10 +159,18 @@ function seedTestimonials() {
   const count = db.prepare("SELECT COUNT(*) AS c FROM testimonials").get().c;
   if (count > 0) return;
   const stmt = db.prepare(
-    "INSERT INTO testimonials (quote, author, role, company, active, position) VALUES (?, ?, ?, ?, ?, ?)"
+    "INSERT INTO testimonials (quote, author, role, company, translations, active, position) VALUES (?, ?, ?, ?, ?, ?, ?)"
   );
   for (const t of DEFAULT_TESTIMONIALS) {
-    stmt.run(t.quote, t.author, t.role, t.company, t.active, t.order);
+    stmt.run(
+      t.quote,
+      t.author,
+      t.role,
+      t.company,
+      JSON.stringify(t.translations || {}),
+      t.active,
+      t.order
+    );
   }
 }
 
@@ -119,9 +184,10 @@ function seedUsers() {
   console.log(`Seeded admin user: ${email}`);
 }
 
-seedSettings();
 seedClients();
 seedTestimonials();
+seedCollectionTranslations("clients", DEFAULT_CLIENTS, "name");
+seedCollectionTranslations("testimonials", DEFAULT_TESTIMONIALS, "quote");
 seedUsers();
 
 export default db;
