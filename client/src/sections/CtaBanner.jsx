@@ -1,18 +1,16 @@
 import React from "react";
 
-export default function CtaBanner() {
+export default function CtaBanner({ cta }) {
+  if (!cta) return null;
   return (
     <section id="contact" className="cta-banner styled">
       <div className="cta-banner-card">
-        <span className="section-eyebrow section-eyebrow--dot">Contact</span>
-        <h2>Reduce your technical risk.</h2>
-        <p>
-          Tell us about your infrastructure and hosting challenges. We will assess your risk
-          profile and propose an action plan within 24 hours.
-        </p>
+        <span className="section-eyebrow section-eyebrow--dot">{cta.eyebrow || "Contact"}</span>
+        <h2>{cta.heading}</h2>
+        <p>{cta.text}</p>
         <div className="cta-banner-actions">
-          <a href="mailto:hello@diginvictus.com" className="button button--banner">
-            Get in touch
+          <a href={cta.ctaLink || "mailto:hello@diginvictus.com"} className="button button--banner">
+            {cta.ctaLabel || "Get in touch"}
           </a>
         </div>
       </div>

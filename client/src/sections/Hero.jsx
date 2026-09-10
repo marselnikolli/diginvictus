@@ -1,6 +1,7 @@
+import React from "react";
 import ThreeSphere from "../components/ThreeSphere.jsx";
 
-export default function Hero({ hero, site }) {
+export default function Hero({ hero, site, ui }) {
   return (
     <section id="hero" className="hero">
       <ThreeSphere enabled={hero?.threejsEnabled !== false} />
@@ -11,17 +12,14 @@ export default function Hero({ hero, site }) {
           {hero?.subTitle && <p className="sub-title">{hero.subTitle}</p>}
           {hero?.ctaEnabled && (
             <div className="hero-cta">
-              <a
-                href={hero.ctaLink || "#"}
-                className="button button--banner"
-              >
+              <a href={hero.ctaLink || "#"} className="button button--banner">
                 {hero.ctaLabel || "Get in touch"}
               </a>
             </div>
           )}
           {hero?.scrollEnabled && (
             <div className="hero-scroll">
-              <a href="#section1" className="js--localscroll" aria-label="Scroll to highlights">
+              <a href="#section1" className="js--localscroll" aria-label={ui?.scrollAria || "Scroll to highlights"}>
                 ▼
               </a>
             </div>

@@ -6,12 +6,9 @@ export default function Highlights({ highlights }) {
   return (
     <section id="section1" className="highlights styled">
       <div className="highlights-header">
-        <span className="section-eyebrow section-eyebrow--dot">Core capabilities</span>
+        <span className="section-eyebrow section-eyebrow--dot">{highlights.eyebrow || "Core capabilities"}</span>
         <h2>{highlights.heading}</h2>
-        <p className="highlights-subtitle">
-          Web development and infrastructure services engineered to keep your digital products
-          secure, fast and always available.
-        </p>
+        <p className="highlights-subtitle">{highlights.subtitle}</p>
       </div>
       {highlights.items && highlights.items.length > 0 && (
         <div className="highlights-grid">

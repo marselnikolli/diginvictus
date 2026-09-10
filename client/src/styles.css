@@ -1471,3 +1471,32 @@ p {
     scroll-behavior: auto !important;
   }
 }
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 2px;
+}
+
+.lang-switch-item {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.lang-switch-item:hover {
+  color: #fff;
+}
+
+.lang-switch-item.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}

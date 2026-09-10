@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Logo from "./Logo.jsx";
+import LanguageSwitcher from "./LanguageSwitcher.jsx";
 
-const links = [
-  { label: "Services", href: "#services" },
-  { label: "Process", href: "#process" },
-  { label: "Work", href: "#work" },
-  { label: "Contact", href: "#contact" },
-];
-
-export default function Header({ site }) {
+export default function Header({ site, ui }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -18,6 +12,13 @@ export default function Header({ site }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const links = [
+    { label: ui?.navServices || "Services", href: "#services" },
+    { label: ui?.navProcess || "Process", href: "#process" },
+    { label: ui?.navWork || "Work", href: "#work" },
+    { label: ui?.navContact || "Contact", href: "#contact" },
+  ];
+
   return (
     <header className={`header${scrolled ? " header--scrolled" : ""}`}>
       <div className="header-inner">
@@ -26,7 +27,7 @@ export default function Header({ site }) {
         </a>
         <span className="header-status" aria-hidden="true">
           <span className="header-dot" />
-          systems online
+          {ui?.headerStatus || "systems online"}
         </span>
         <nav className="header-nav" aria-label="Primary">
           {links.map((l) => (
@@ -35,11 +36,9 @@ export default function Header({ site }) {
             </a>
           ))}
         </nav>
-        <a
-          href="mailto:hello@diginvictus.com"
-          className="button button--banner"
-        >
-          Get in touch
+        <LanguageSwitcher />
+        <a href="mailto:hello@diginvictus.com" className="button button--banner">
+          {ui?.getInTouch || "Get in touch"}
         </a>
       </div>
     </header>
