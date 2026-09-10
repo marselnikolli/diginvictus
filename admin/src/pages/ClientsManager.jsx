@@ -1,11 +1,26 @@
 import React, { useEffect, useState } from "react";
+import { LOCALES, LOCALE_LABELS } from "shared";
 import { api } from "../api.js";
 import { TextInput, Toggle, ImageInput } from "../components/Fields.jsx";
+
+const EMPTY = { name: "", websiteUrl: "", logo: "", description: "", active: true };
+
+function withTranslations(client) {
+  return {
+    ...EMPTY,
+    ...client,
+    translations: {
+      it: { name: "", description: "", ...(client?.translations?.it || {}) },
+      sq: { name: "", description: "", ...(client?.translations?.sq || {}) },
+    },
+  };
+}
 
 export default function ClientsManager() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
+  const [activeLocale, setActiveLocale] = useState("en");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
 
@@ -19,10 +34,22 @@ export default function ClientsManager() {
 
   useEffect(load, []);
 
-  const form = editing || { name: "", websiteUrl: "", logo: "", description: "", active: true };
+  function startEditing(client) {
+    setActiveLocale("en");
+    setEditing(withTranslations(client));
+  }
+
+  const form = editing || withTranslations(null);
 
   function updateForm(field, v) {
     setEditing({ ...form, [field]: v });
+  }
+
+  function updateTranslation(locale, field, v) {
+    setEditing({
+      ...form,
+      translations: { ...form.translations, [locale]: { ...form.translations[locale], [field]: v } },
+    });
   }
 
   async function save() {
@@ -69,7 +96,7 @@ export default function ClientsManager() {
     <div>
       <header className="page-header">
         <h1>Clients</h1>
-        <button type="button" className="btn btn--primary" onClick={() => setEditing({ name: "", websiteUrl: "", logo: "", description: "", active: true })}>
+        <button type="button" className="btn btn--primary" onClick={() => startEditing(null)}>
           + Add client
         </button>
       </header>
@@ -80,12 +107,50 @@ export default function ClientsManager() {
         <div className="form-card">
           <h2>{editing.id ? "Edit client" : "New client"}</h2>
           <div className="form-grid">
-            <TextInput label="Name" value={form.name} onChange={(v) => updateForm("name", v)} />
             <TextInput label="Website URL" value={form.websiteUrl} onChange={(v) => updateForm("websiteUrl", v)} />
-            <TextInput label="Project description" value={form.description || ""} onChange={(v) => updateForm("description", v)} />
             <ImageInput label="Logo" value={form.logo} onChange={(v) => updateForm("logo", v)} />
             <Toggle label="Visible on site" value={form.active} onChange={(v) => updateForm("active", v)} />
           </div>
+
+          <div className="lang-tabs" role="tablist" aria-label="Language">
+            {LOCALES.map((locale) => (
+              <button
+                key={locale}
+                type="button"
+                role="tab"
+                aria-selected={locale === activeLocale}
+                className={locale === activeLocale ? "lang-tab active" : "lang-tab"}
+                onClick={() => setActiveLocale(locale)}
+              >
+                {LOCALE_LABELS[locale]}
+              </button>
+            ))}
+          </div>
+
+          {activeLocale === "en" ? (
+            <div className="lang-panel">
+              <TextInput label="Name" value={form.name} onChange={(v) => updateForm("name", v)} />
+              <TextInput
+                label="Project description"
+                value={form.description || ""}
+                onChange={(v) => updateForm("description", v)}
+              />
+            </div>
+          ) : (
+            <div className="lang-panel">
+              <TextInput
+                label="Name"
+                value={form.translations[activeLocale].name}
+                onChange={(v) => updateTranslation(activeLocale, "name", v)}
+              />
+              <TextInput
+                label="Project description"
+                value={form.translations[activeLocale].description}
+                onChange={(v) => updateTranslation(activeLocale, "description", v)}
+              />
+            </div>
+          )}
+
           <div className="form-actions">
             <button type="button" className="btn btn--primary" onClick={save}>
               {status === "saving" ? "Saving…" : "Save"}
@@ -112,7 +177,7 @@ export default function ClientsManager() {
             >
               {c.active ? "Visible" : "Hidden"}
             </button>
-            <button type="button" className="btn btn--ghost" onClick={() => setEditing({ ...c })}>
+            <button type="button" className="btn btn--ghost" onClick={() => startEditing(c)}>
               Edit
             </button>
             <button type="button" className="btn btn--danger" onClick={() => remove(c)}>
