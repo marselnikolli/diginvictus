@@ -29,8 +29,9 @@ content editable in all three languages from the admin panel.
 - No `hreflang` tags or sitemap changes.
 - No new public testimonials section (testimonials are managed but not rendered
   today; they only gain translation support).
-- No automated test suite (the repo has none); verification is a production build
-  plus an API smoke check.
+- No browser/E2E test suite; pure logic is covered by Node's built-in
+  `node:test`, and end-to-end verification is a production build plus an API
+  smoke check.
 
 ## Data model
 
