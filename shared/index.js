@@ -14,7 +14,7 @@ export const DEFAULT_SITE = {
     year: "2026",
   },
   it: {
-    tagline: "Costruiamo il Digitale",
+    tagline: "Building Digital",
     metaDescription:
       "DIGInvictus — sviluppo web, infrastruttura server e hosting gestito. Prodotti digitali sicuri, veloci e affidabili.",
     keywords:
@@ -22,7 +22,7 @@ export const DEFAULT_SITE = {
     copyright: "Tutti i diritti riservati.",
   },
   sq: {
-    tagline: "Ndërtojmë Digjitalen",
+    tagline: "Building Digital",
     metaDescription:
       "DIGInvictus — zhvillim web, infrastrukturë serveri dhe hosting i menaxhuar. Produkte digjitale të sigurta, të shpejta dhe të besueshme.",
     keywords:
@@ -42,12 +42,12 @@ export const DEFAULT_HERO = {
     threejsEnabled: true,
   },
   it: {
-    headline: "Costruiamo il Digitale",
+    headline: "Building Digital",
     subTitle: "Sviluppo Web · Infrastruttura · Hosting",
     ctaLabel: "Contattaci",
   },
   sq: {
-    headline: "Ndërtojmë Digjitalen",
+    headline: "Building Digital",
     subTitle: "Zhvillim Web · Infrastrukturë · Hosting",
     ctaLabel: "Kontaktoni",
   },
