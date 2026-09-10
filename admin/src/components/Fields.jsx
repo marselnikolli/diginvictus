@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { api } from "../api.js";
 
 export function TextInput({ label, value, onChange, placeholder }) {
@@ -25,21 +25,30 @@ export function Textarea({ label, value, onChange, rows = 3 }) {
 }
 
 export function ListInput({ label, value, onChange, rows = 4 }) {
-  const text = Array.isArray(value) ? value.join("\n") : value || "";
+  const toText = (v) => (Array.isArray(v) ? v.join("\n") : v || "");
+  const [text, setText] = useState(() => toText(value));
+
+  useEffect(() => {
+    const normalized = toText(value);
+    setText((current) => (current.trim() === normalized.trim() ? current : normalized));
+  }, [value]);
+
   return (
     <label className="field">
       <span className="field-label">{label}</span>
       <textarea
         rows={rows}
         value={text}
-        onChange={(e) =>
+        onChange={(e) => {
+          const next = e.target.value;
+          setText(next);
           onChange(
-            e.target.value
+            next
               .split("\n")
               .map((line) => line.trim())
               .filter((line) => line.length > 0)
-          )
-        }
+          );
+        }}
       />
     </label>
   );

@@ -565,14 +565,14 @@ button {
   display: flex;
   gap: 6px;
   margin: 20px 0 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #e2e3ec;
 }
 
 .lang-tab {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  color: rgba(255, 255, 255, 0.6);
+  color: #55566e;
   font: inherit;
   font-size: 13px;
   padding: 8px 14px;
@@ -580,12 +580,12 @@ button {
 }
 
 .lang-tab:hover {
-  color: #fff;
+  color: #23243b;
 }
 
 .lang-tab.active {
-  color: #fff;
-  border-bottom-color: #6ea8fe;
+  color: #120755;
+  border-bottom-color: #120755;
 }
 
 .shared-fields {
@@ -596,12 +596,12 @@ button {
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.5);
+  color: #6b6c82;
   margin: 0 0 12px;
 }
 
 .field-hint {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #6b6c82;
   margin: 4px 0 8px;
 }
