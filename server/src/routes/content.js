@@ -10,6 +10,17 @@ function getAllSettings() {
   return Object.fromEntries(rows.map((r) => [r.key, JSON.parse(r.value)]));
 }
 
+function isValidSectionValue(body) {
+  return (
+    body !== null &&
+    typeof body === "object" &&
+    !Array.isArray(body) &&
+    body.en !== null &&
+    typeof body.en === "object" &&
+    !Array.isArray(body.en)
+  );
+}
+
 router.get("/", (req, res) => {
   res.json(getAllSettings());
 });
@@ -26,7 +37,10 @@ router.put("/:section", requireAuth, (req, res) => {
   if (!CONTENT_SECTIONS.includes(section)) {
     return res.status(400).json({ error: "Unknown section" });
   }
-  const value = JSON.stringify(req.body ?? {});
+  if (!isValidSectionValue(req.body)) {
+    return res.status(400).json({ error: "Body must be an object with an 'en' object" });
+  }
+  const value = JSON.stringify(req.body);
   db.prepare("UPDATE settings SET value = ? WHERE key = ?").run(value, section);
   res.json({ ok: true, section, value: req.body });
 });
