@@ -165,7 +165,17 @@ function addEnItem(value, key, fields) {
 }
 
 function removeEnItem(value, key, index) {
-  return { ...value, en: { ...value.en, [key]: (value.en?.[key] || []).filter((_, i) => i !== index) } };
+  const next = {
+    ...value,
+    en: { ...value.en, [key]: (value.en?.[key] || []).filter((_, i) => i !== index) },
+  };
+  for (const locale of LOCALES) {
+    if (locale === "en") continue;
+    if (Array.isArray(value[locale]?.[key])) {
+      next[locale] = { ...value[locale], [key]: value[locale][key].filter((_, i) => i !== index) };
+    }
+  }
+  return next;
 }
 
 export default function SectionEditor() {

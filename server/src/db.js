@@ -119,8 +119,9 @@ function migrateSettingsLocales() {
       continue;
     }
     if (parsed && typeof parsed === "object" && "en" in parsed) continue;
-    const defaults = DEFAULT_SECTIONS[row.key] || { it: {}, sq: {} };
-    update.run(JSON.stringify({ en: parsed, it: defaults.it || {}, sq: defaults.sq || {} }), row.key);
+    const defaults = DEFAULT_SECTIONS[row.key] || { en: {}, it: {}, sq: {} };
+    const en = { ...(defaults.en || {}), ...(parsed && typeof parsed === "object" ? parsed : {}) };
+    update.run(JSON.stringify({ en, it: defaults.it || {}, sq: defaults.sq || {} }), row.key);
   }
 }
 migrateSettingsLocales();
